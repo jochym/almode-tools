@@ -7,22 +7,31 @@ The directory structure
                       |
                       +--- harmonic
                       |
-                      +--- TDEP_<volume_1>
+                      +--- TDEP_<volume 1> ---+--- opt
+                      |                       |
+                      |                       +--- harmonic (may be linked to harmonic upstairs)
+                      |                       |
+                      |                       +--- T_<temperature 1>
+                      |                       |
+                      |                       +--- T_<temperature 1>_base
+                      |                       |
+                      |                       +--- ...
+                      |                       |
                       |
-                      +--- TDEP_<volume_2>
+                      +--- TDEP_<volume 2>
                       |
 
 
 The basic procedure:
 
 1. Start with optimized structure in `opt` directory
-2. Run the basic harmonic calculation in `harmonic` directory
-    a. Starting from the unit cell as POSCAR file
-    b. Generate displacements pattern
-    c. Generate displacements
-    d. Run vasp on displacements
-    e. Extract forces
-    f. Calculate phonons and Mean Squere Displacements (MSD)
+2. Run the basic harmonic calculation in `harmonic` directory:
+    1. Starting from the unit cell as POSCAR file
+    2. Generate displacements pattern
+    3. Generate displacements
+    4. Run vasp on displacements
+    5. Extract forces
+    6. Calculate phonons and Mean Squere Displacements (MSD)
 3. Calculate TDEP cycle for several volumes in `TDEP_<volume>`
 
 
