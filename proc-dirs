@@ -1,0 +1,20 @@
+#!/bin/bash
+
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
+
+for d in $* ; do
+    (cd $d
+	echo -n "Process $d: "
+	if [ -f QHA.bands ] ; then 
+		echo " ready "	
+	else
+		ln -s qha_gen.in QHA_gen.in
+	        ../proc-calcs QHA
+	fi
+    )
+    python2 ./plotband.py -u THz --ex ../exper_GX.dat $d/QHA*.bands
+    mv band_tmp.pdf band_${d}.pdf
+done
+
+

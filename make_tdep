@@ -1,0 +1,24 @@
+#!/bin/bash
+
+ALM=/opt/bin/alm
+
+n=$1
+shift
+
+for T in $* ; do
+  mkdir -p T_$T
+  ( cd T_$T
+  ln -s ../bin ../INCAR ../KPOINTS ../POTCAR ../SPOSCAR ../vasprun.conf .
+  ln -s ../tdep_base base
+
+  ../make-gen.py gen -p QHA -n SPOSCAR > qha_gen.in
+
+  $ALM qha_gen.in >qha_gen.log
+
+  ../make-disp.py -T $T -p SPOSCAR -n $n  disp
+
+  ../run-calcs
+  )
+done
+
+

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+NP=$1
+NAME=$2
+RSC=$3
+echo -n " ${NAME}:${NP}:${RSC} "
+qsub <<EOF
+#!/bin/bash
+#PBS -q batch
+#PBS -N $NAME
+#PBS -l nodes=1:ppn=${NP}:${RSC}
+
+numprocs=\`wc -l <\$PBS_NODEFILE\`
+
+cd \$PBS_O_WORKDIR
+export OMP_NUM_THREADS=$NP
+mpirun.openmpi -np 1  ~/Projects/alamode/develop/anphon/anphon  QHA_self.in |tee QHA_self.log
+# ~/Projects/alamode/develop/anphon/anphon  QHA_self.in |tee QHA_self.log
+
+EOF

@@ -1,0 +1,24 @@
+#!/bin/bash
+
+p=$1
+nq=$2
+rsc=$3
+
+for (( k=0 ; k < ${nq} / 2 + 1 ; k=k+1 )) ; do
+    q=`echo "$k / $nq" |bc -l`
+    q=`printf "%7.6f" $q`
+    for (( n=1 ; n<7 ; n=n+1 )) ; do 
+        d=q_${q}_${n}
+        if [ -d ${d} ] ; then 
+            echo "Ready $d"
+        else 
+            mkdir -p $d
+            (cd $d
+                ln -s ../QHA.xml ../QHA.born .
+                sed -e "s/q/${q}/g"  -e "s/n/${n}/g" < ../QHA_modes.in > QHA_modes.in
+                sed -e "s/nq/${nq}/g" < ../QHA_self.in > QHA_self.in
+                run-on-tsi "../run-anph ${p} ${d} ${rsc}"
+            )
+        fi
+    done
+done

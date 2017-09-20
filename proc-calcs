@@ -1,0 +1,110 @@
+#!/bin/bash
+
+
+i=${1%%_gen.in}
+ALM=/opt/bin/alm
+ANPH=/opt/bin/anphon
+
+echo "Process: $i"
+
+python2 ./bin/extract.py --VASP=SPOSCAR --get=disp calc-disp*/vasprun*.xml > disp.dat
+python2 ./bin/extract.py --VASP=SPOSCAR --get=force calc-disp*/vasprun*.xml > force.dat
+
+fl=`ls ${i}.pattern_*`
+n=`cat $fl |grep '^\s*[0-9]*:' |wc -l`
+nh=`grep '^\s*[0-9]*:' <${i}.pattern_HARMONIC |wc -l`
+
+n=`ls -d calc-disp* | wc -l`
+
+echo "NDAT: $n"
+
+sed -e 's/MODE *= *[a-zA-Z]*/MODE = fitting /' < ${i}_gen.in >  ${i}_fit.in
+
+tfn=`mktemp`
+
+cat <<EOF > $tfn
+
+&fitting
+    NDATA = $n
+    DFILE = disp.dat
+    FFILE = force.dat
+/
+
+EOF
+
+cat $tfn >> ${i}_fit.in
+if [ -e ${i}_fit_cub.in ]; then
+    if grep -q '&fitting' ${i}_fit_cub.in ; then
+	echo "Cubic input already generated"
+    else
+	cat $tfn >> ${i}_fit_cub.in
+    fi
+fi
+
+rm -f $tfn
+
+$ALM ${i}_fit.in > ${i}_fit.log
+grep "Residual sum" ${i}_fit.log
+
+if [ -e ${i}_fit_cub.in ]; then
+    $ALM ${i}_fit_cub.in > ${i}_fit_cub.log
+    grep "Residual sum" ${i}_fit_cub.log
+fi
+
+
+
+#sed -e 's/MODE *= *[a-zA-Z]*/MODE = phonons ;   FCSXML = '"${i}.xml"' /' \
+#    -e 's/NAT *= *[0-9]*//' -e 's/^# *MASS/  MASS/' < ${i}_gen.in >  ${i}_phon.in
+
+
+tfnp=`mktemp`
+cat <<EOF > $tfnp
+
+&kpoint
+  1  # KPMODE = 1: line mode
+  G 0.0 0.0 0.0 X 0.0 0.5 0.5 51
+/
+
+EOF
+
+tfnd=`mktemp`
+cat <<EOF > $tfnd
+
+&kpoint
+  2  # KPMODE = 2: grid mode
+  20 20 20
+/
+
+EOF
+
+
+../make-gen.py phon -b 2 -p QHA -n SPOSCAR -e 1 -t 1600 > ${i}_phon.in
+cp ${i}_phon.in ${i}_dos.in
+cat $tfnp >> ${i}_phon.in
+cat $tfnd >> ${i}_dos.in
+
+echo "Calculating harmonic phonons"
+$ANPH ${i}_phon.in >${i}_phon.log
+mv ${i}.evec ${i}_phon.evec
+
+echo "Calculating harmonic dos"
+$ANPH ${i}_dos.in >${i}_dos.log
+
+if [ -e ${i}_fit_cub.in ]; then
+    ../make-gen.py phon -b 2 -p QHA_cub -n SPOSCAR -e 1 -t 1600 > ${i}_phon_cub.in
+    ln -s QHA.born QHA_cub.born
+    cp ${i}_phon_cub.in ${i}_dos_cub.in
+    cat $tfnp >> ${i}_phon_cub.in
+    cat $tfnd >> ${i}_dos_cub.in
+
+    echo "Calculating anharmonic phonons"
+    $ANPH ${i}_phon_cub.in >${i}_phon_cub.log
+    mv ${i}_cub.evec ${i}_phon_cub.evec
+
+    echo "Calculating anharmonic dos"
+    $ANPH ${i}_dos_cub.in >${i}_dos_cub.log
+fi
+
+rm -f $tfnp $tfnd
+
+
