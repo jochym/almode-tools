@@ -26,7 +26,7 @@ The basic procedure:
 
 1. Start with optimized structure in `opt` directory
 2. Run the basic harmonic calculation in `harmonic` directory:
-    1. Starting from the unit cell as POSCAR file
+    1. Starting from the unit cell as `POSCAR` file
     2. Generate displacements pattern
     3. Generate displacements
     4. Run vasp on displacements
