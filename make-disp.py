@@ -18,8 +18,12 @@ def read_elm_order(cr):
     return d
 
 @click.command()
-@click.option('-p', '--poscar', default='SPOSCAR', type=click.Path(exists=True), help='Supercell POSCAR file (SPOSCAR)')
-@click.option('-m', '--msdfile', default='base/QHA.msd', help='Base calc mean squere displacement file (base/QHA.msd)')
+@click.option('-p', '--poscar', default='SPOSCAR', 
+                type=click.Path(exists=True),
+                help='Supercell POSCAR file (SPOSCAR)')
+@click.option('-m', '--msdfile', default='base/QHA.msd', 
+                type=click.Path(exists=True), 
+                help='Base calc mean squere displacement file (base/QHA.msd)')
 @click.option('-T', '--temp', default=300, help='Temperature (300)')
 @click.option('-n', '--number', default=50, help='Number of configurations (50)')
 @click.argument('outfile')
