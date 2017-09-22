@@ -19,16 +19,16 @@ def read_elm_order(cr):
 
 @click.command()
 @click.option('-p', '--poscar', default='SPOSCAR', type=click.Path(exists=True), help='Supercell POSCAR file (SPOSCAR)')
-@click.option('-b', '--base', default='base', help='Base calc directory (base)')
+@click.option('-m', '--msdfile', default='base/QHA.msd', help='Base calc mean squere displacement file (base/QHA.msd)')
 @click.option('-T', '--temp', default=300, help='Temperature (300)')
 @click.option('-n', '--number', default=50, help='Number of configurations (50)')
 @click.argument('outfile')
-def disp(poscar, base, temp, outfile, number):
+def disp(poscar, msdfile, temp, outfile, number):
     """Generates thermal displacement files """
 
     cr = ase.io.read(poscar)
     elems=read_elm_order(cr)
-    msd=loadtxt(path.join(base,'QHA.msd')).T
+    msd=loadtxt(path.join(msdfile)).T
     dsp=scipy.interpolate.interp1d(msd[0],msd[1:])(temp)
     dsp=dsp.reshape((-1,3))
     basepos=cr.get_positions()
