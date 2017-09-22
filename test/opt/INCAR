@@ -1,0 +1,16 @@
+INCAR created by Atomic Simulation Environment
+ SYMPREC = 1.00e-05
+ EDIFF = 1.00e-07
+ EDIFFG = 1.00e-05
+ ALGO = Fast
+ PREC = Accurate
+ GGA = PE
+ IBRION = 1
+ NSW = 0
+ ISMEAR = 1
+ ISIF = 7
+ NPAR = 4
+ LWAVE = .FALSE.
+ LCHARG = .FALSE.
+ ADDGRID = .TRUE.
+ LREAL = .FALSE.
