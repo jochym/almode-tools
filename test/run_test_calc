@@ -1,4 +1,15 @@
 #!/bin/bash
 
-python3 -c 'from ase.build import bulk ; bulk("Zr",crystalstructure="bcc",a=4.7, cubic=True).repeat(2).write("SPOSCAR",format="vasp",direct=True,vasp5=True)'
+wd=`pwd`
+export PATH=`dirname ${wd}`:$PATH
+
+nm='Zr'
+
+mkdir harmonic
+(cd harmonic
+    ln -s ../opt/{INCAR,KPOINTS,SPOSCAR,POTCAR,vasprun.conf} .
+    
+    make-gen.py -o 2 -p $nm -n SPOSCAR -s 1.0 -b 0 > ${nm}_gen.in
+)
+
 
