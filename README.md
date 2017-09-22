@@ -36,14 +36,15 @@ The basic procedure:
 
 
 TODO
+-----
 
- create common directory in /opt/bin/ for all scripts:
-  make-gen
-  alm
-  run-calcs
-  proc-calcs
-  make-tdep
-  proc-dirs
-  extract.py
+create common directory in /opt/bin/ for all scripts:
+* make-gen
+* alm
+* run-calcs
+* proc-calcs
+* make-tdep
+* proc-dirs
+* extract.py
   
  make short (one line) comments on external parameters expected in the command line
