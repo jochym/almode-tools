@@ -1,8 +1,10 @@
 #!/bin/bash
 
-p=$1
-nq=$2
-rsc=$3
+prefix=$1
+p=$2
+nq=$3
+rsc=$4
+
 
 for (( k=0 ; k < ${nq} / 2 + 1 ; k=k+1 )) ; do
     q=`echo "$k / $nq" |bc -l`
@@ -15,8 +17,8 @@ for (( k=0 ; k < ${nq} / 2 + 1 ; k=k+1 )) ; do
             mkdir -p $d
             (cd $d
                 ln -s ../QHA.xml ../QHA.born .
-                sed -e "s/q/${q}/g"  -e "s/n/${n}/g" < ../QHA_modes.in > QHA_modes.in
-                sed -e "s/nq/${nq}/g" < ../QHA_self.in > QHA_self.in
+                sed -e "s/q/${q}/g"  -e "s/n/${n}/g" < ../${prefix}_modes.in > ${prefix}_modes.in
+                sed -e "s/nq/${nq}/g" < ../ph_self.in > ph_self.in
                 run-on-tsi "../run-anph ${p} ${d} ${rsc}"
             )
         fi

@@ -78,7 +78,7 @@ cat <<EOF > $tfnd
 EOF
 
 
-../make-gen.py phon -b 2 -p QHA -n SPOSCAR -e 1 -t 1600 > ${i}_phon.in
+../make-gen.py phon -b 2 -p ${i} -n SPOSCAR -e 1 -t 1600 > ${i}_phon.in
 cp ${i}_phon.in ${i}_dos.in
 cat $tfnp >> ${i}_phon.in
 cat $tfnd >> ${i}_dos.in
@@ -91,8 +91,8 @@ echo "Calculating harmonic dos"
 $ANPH ${i}_dos.in >${i}_dos.log
 
 if [ -e ${i}_fit_cub.in ]; then
-    ../make-gen.py phon -b 2 -p QHA_cub -n SPOSCAR -e 1 -t 1600 > ${i}_phon_cub.in
-    ln -s QHA.born QHA_cub.born
+    ../make-gen.py phon -b 2 -p ${i}_cub -n SPOSCAR -e 1 -t 1600 > ${i}_phon_cub.in
+    ln -s ${i}.born ${i}_cub.born
     cp ${i}_phon_cub.in ${i}_dos_cub.in
     cat $tfnp >> ${i}_phon_cub.in
     cat $tfnd >> ${i}_dos_cub.in

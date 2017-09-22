@@ -3,17 +3,24 @@
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 
+prefix=$1
+shift
+
 for d in $* ; do
     (cd $d
-	echo -n "Process $d: "
-	if [ -f QHA.bands ] ; then 
-		echo " ready "	
-	else
-		ln -s qha_gen.in QHA_gen.in
-	        ../proc-calcs QHA
-	fi
+        echo -n "Process $d: "
+        if [ -f ${prefix}.bands ] ; then 
+            echo " ready "
+        else
+            ../proc-calcs ${prefix}
+        fi
     )
-    python2 ./plotband.py -u THz --ex ../exper_GX.dat $d/QHA*.bands
+    if [ -f ../exper.dat ] ; then 
+        exper="--ex ../exper.dat"
+    else
+        exper=""
+    fi
+    python2 ./plotband.py -u THz ${exper}  $d/${prefix}*.bands
     mv band_tmp.pdf band_${d}.pdf
 done
 
