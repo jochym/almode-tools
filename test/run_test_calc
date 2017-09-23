@@ -21,11 +21,16 @@ mkdir -p harmonic
     
     run-calcs
 
-    echo -n "Running vasp: "
-    sleep 10
-    while grep 'F=' calc-disp1/OSZICAR ; do 
+    echo "Running vasp"
+    sleep 5
+    while true ; do 
         sleep 5
-        echo -n '.'
+        if grep -q 'F=' calc-disp1/OSZICAR ; then 
+            break
+        else
+            l=`tail -n 1 calc-disp1/OSZICAR|awk '{printf("(%2s)  %12s", $2, $4)}'`
+            printf '\r VASP dE: %20s' "${l}"
+        fi
     done
     echo ' done'
 
