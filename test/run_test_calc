@@ -10,6 +10,17 @@ mkdir harmonic
     ln -s ../opt/{INCAR,KPOINTS,SPOSCAR,POTCAR,vasprun.conf} .
     
     make-gen.py -o 2 -p $nm -n SPOSCAR -s 1.0 -b 0 > ${nm}_gen.in
+
+    run-calcs
+
+    echo -n "Running vasp: "
+    sleep 10
+    while grep 'F=' calc-disp1/OSZICAR ; do 
+        sleep 5
+        echo -n '.'
+    done
+    echo ' done'
+
 )
 
 
