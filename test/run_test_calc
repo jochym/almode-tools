@@ -9,6 +9,23 @@ nm='Zr'
 
 echo "Calculating basic harmonic phonons"
 
+function vasp_wait {
+    oc="${1}/OSZICAR"
+    echo "Running vasp"
+    sleep 5
+    while true ; do 
+        sleep 5
+        if grep -q 'F='  "${oc}" ; then 
+            break
+        else
+            l=`tail -n 1 "${oc}"|awk '{printf("(%2s)  %12s", $2, $4)}'`
+            printf '\r VASP dE: %20s' "${l}"
+        fi
+    done
+    echo ' done'
+    
+}
+
 mkdir -p harmonic
 (cd harmonic
     ln -s ../opt/{INCAR,KPOINTS,SPOSCAR,POTCAR,vasprun.conf} .
@@ -20,19 +37,7 @@ mkdir -p harmonic
     displace.py --mag=0.02 --prefix=disp --VASP=SPOSCAR ${nm}.pattern_HARMONIC   
     
     run-calcs
-
-    echo "Running vasp"
-    sleep 5
-    while true ; do 
-        sleep 5
-        if grep -q 'F=' calc-disp1/OSZICAR ; then 
-            break
-        else
-            l=`tail -n 1 calc-disp1/OSZICAR|awk '{printf("(%2s)  %12s", $2, $4)}'`
-            printf '\r VASP dE: %20s' "${l}"
-        fi
-    done
-    echo ' done'
+    vasp_wait calc-disp1
 
 )
 
