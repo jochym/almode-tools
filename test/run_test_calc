@@ -1,16 +1,24 @@
 #!/bin/bash
 
 wd=`pwd`
+
 export PATH=`dirname ${wd}`:$PATH
+export LANG=C.UTF-8
 
 nm='Zr'
 
-mkdir harmonic
+echo "Calculating basic harmonic phonons"
+
+mkdir -p harmonic
 (cd harmonic
     ln -s ../opt/{INCAR,KPOINTS,SPOSCAR,POTCAR,vasprun.conf} .
     
-    make-gen.py -o 2 -p $nm -n SPOSCAR -s 1.0 -b 0 > ${nm}_gen.in
+    make-gen.py -o 1 -p $nm -n SPOSCAR -s 1.0 -b 0 > ${nm}_gen.in
 
+    alm ${nm}_gen.in > ${nm}_gen.log
+    
+    displace.py --mag=0.02 --prefix=disp --VASP=SPOSCAR ${nm}.pattern_HARMONIC   
+    
     run-calcs
 
     echo -n "Running vasp: "
