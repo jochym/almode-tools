@@ -7,8 +7,8 @@ ANPH=/opt/bin/anphon
 
 echo "Process: $i"
 
-python2 ./bin/extract.py --VASP=SPOSCAR --get=disp calc-disp*/vasprun*.xml > disp.dat
-python2 ./bin/extract.py --VASP=SPOSCAR --get=force calc-disp*/vasprun*.xml > force.dat
+extract.py --VASP=SPOSCAR --get=disp calc-disp*/vasprun*.xml > disp.dat
+extract.py --VASP=SPOSCAR --get=force calc-disp*/vasprun*.xml > force.dat
 
 fl=`ls ${i}.pattern_*`
 n=`cat $fl |grep '^\s*[0-9]*:' |wc -l`
@@ -35,9 +35,9 @@ EOF
 cat $tfn >> ${i}_fit.in
 if [ -e ${i}_fit_cub.in ]; then
     if grep -q '&fitting' ${i}_fit_cub.in ; then
-	echo "Cubic input already generated"
+        echo "Cubic input already generated"
     else
-	cat $tfn >> ${i}_fit_cub.in
+        cat $tfn >> ${i}_fit_cub.in
     fi
 fi
 
@@ -77,8 +77,13 @@ cat <<EOF > $tfnd
 
 EOF
 
+BORN=""
 
-../make-gen.py phon -b 2 -p ${i} -n SPOSCAR -e 1 -t 1600 > ${i}_phon.in
+if [ -e ${i}.born ] ; then
+    BORN=" -b 2 "
+fi
+
+make-gen.py phon ${BORN} -p ${i} -n SPOSCAR -e 1 -t 1600 > ${i}_phon.in
 cp ${i}_phon.in ${i}_dos.in
 cat $tfnp >> ${i}_phon.in
 cat $tfnd >> ${i}_dos.in
@@ -91,8 +96,10 @@ echo "Calculating harmonic dos"
 $ANPH ${i}_dos.in >${i}_dos.log
 
 if [ -e ${i}_fit_cub.in ]; then
-    ../make-gen.py phon -b 2 -p ${i}_cub -n SPOSCAR -e 1 -t 1600 > ${i}_phon_cub.in
-    ln -s ${i}.born ${i}_cub.born
+    make-gen.py phon ${BORN} -p ${i}_cub -n SPOSCAR -e 1 -t 1600 > ${i}_phon_cub.in
+    if [ -n "${BORN}" ] ; then
+        ln -s ${i}.born ${i}_cub.born
+    fi
     cp ${i}_phon_cub.in ${i}_dos_cub.in
     cat $tfnp >> ${i}_phon_cub.in
     cat $tfnd >> ${i}_dos_cub.in

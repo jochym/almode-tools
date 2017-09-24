@@ -15,7 +15,7 @@ import click
 @click.option('-e', '--evec', default=1, help='Print eigenvectors (1)')
 @click.option('-m', '--msd', default=1, help='Print mean squere displacement (1)')
 @click.option('-t', '--tmax', default=1000, help='Max temperature (1000)')
-@click.option('-b', '--born', default=0, help='Use info from <prefix>.born as Born effective charges')
+@click.option('-b', '--born', default='', help='Use info from <prefix>.born as Born effective charges')
 def gen(name, order, prefix, scale, action, evec, msd, tmax, born):
     """Generates gen file """
 
@@ -101,6 +101,8 @@ def gen(name, order, prefix, scale, action, evec, msd, tmax, born):
     
     if born :
         born = 'BORNINFO = {prefix}.born \n  NONANALYTIC = {born} \n'.format(prefix=prefix, born=born)
+    else :
+        born = ''
 
     print(tmpl[action].format(prefix=prefix, nat=nat, nkd=nkd, kd=kd, order=order, evec=evec, msd=msd,
                       scale=scl, cell=cell, cutoff=cutoff, positions=positions, mass=mass, tmax=tmax, born=born))

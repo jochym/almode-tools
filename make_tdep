@@ -1,8 +1,9 @@
 #!/bin/bash
 
-ALM=/opt/bin/alm
+ALM=alm
+export LC_ALL=C.UTF-8
 
-$prefix=$1
+prefix=$1
 shift
 
 n=$1
@@ -10,13 +11,27 @@ shift
 
 for T in $* ; do
   mkdir -p T_$T
-  (cd T_$T
-    ln -s ../bin ../INCAR ../KPOINTS ../POTCAR ../SPOSCAR ../vasprun.conf .
-    ln -s ../tdep_base base
+  ( cd T_$T
 
-    make-gen.py gen -p ${prefix} -n SPOSCAR > tdep_gen.in
+    ln -s ../INCAR ../KPOINTS ../POTCAR ../SPOSCAR ../vasprun.conf .
+    if [ -e ../${prefix}.born ] ; then
+      ln -s ../${prefix}.born .
+    fi
 
-    $ALM tdep_gen.in >tdep_gen.log
+    make-gen.py gen -p $prefix -n SPOSCAR > ${prefix}_gen.in
+    make-gen.py gen -p $prefix -n SPOSCAR |sed -e 's/MODE *= *[a-zA-Z]*/MODE = fitting /' > ${prefix}_fit.in
+
+    make-gen.py gen -o 2 -p ${prefix}_cub -n SPOSCAR > ${prefix}_gen_cub.in
+    make-gen.py gen -o 2 -p ${prefix}_cub -n SPOSCAR |sed -e 's/MODE *= *[a-zA-Z]*/MODE = fitting /' > ${prefix}_fit_cub.in
+
+    $ALM ${prefix}_gen.in >${prefix}_gen.log
+    $ALM ${prefix}_gen_cub.in >${prefix}_gen_cub.log
+
+    if [ -d ../T_${T}_base ]; then 
+        ln -s ../T_${T}_base base
+    else
+        ln -s ../harmonic base
+    fi
 
     make-disp.py -m base/${prefix}.msd -T $T -p SPOSCAR -n $n  disp
 

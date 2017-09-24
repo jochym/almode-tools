@@ -14,8 +14,9 @@
 from __future__ import print_function, division
 import numpy as np
 import optparse
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
 
 # parser options
 usage = "usage: %prog [options] file1.dos file2.dos ... "
@@ -216,4 +217,4 @@ if __name__ == '__main__':
     if options.print_key:
         plt.legend(loc='upper right', prop={'size': 12})
 
-    plt.show()
+    plt.savefig('dos_tmp.pdf', dpi=300, transparent=False)

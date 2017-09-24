@@ -1,18 +1,17 @@
 #!/bin/bash
 
 export LC_ALL=C.UTF-8
-export LANG=C.UTF-8
 
 prefix=$1
 shift
 
 for d in $* ; do
     (cd $d
-        echo -n "Process $d: "
+        echo -n "Enter $d: "
         if [ -f ${prefix}.bands ] ; then 
             echo " ready "
         else
-            ../proc-calcs ${prefix}
+            proc-calcs ${prefix}
         fi
     )
     if [ -f ../exper.dat ] ; then 
@@ -20,8 +19,10 @@ for d in $* ; do
     else
         exper=""
     fi
-    python2 ./plotband.py -u THz ${exper}  $d/${prefix}*.bands
+    plotband.py -u THz ${exper}  $d/${prefix}*.bands
     mv band_tmp.pdf band_${d}.pdf
+    plotdos.py -u THz $d/${prefix}*.dos
+    mv dos_tmp.pdf dos_${d}.pdf
 done
 
 

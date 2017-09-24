@@ -11,12 +11,12 @@
 # or http://opensource.org/licenses/mit-license.php for information.
 #
 
+from __future__ import print_function, division
 import numpy as np
 import optparse
 
 import matplotlib as mpl
 mpl.use('Agg')
-
 import matplotlib.pyplot as plt
 
 
@@ -222,4 +222,3 @@ if __name__ == '__main__':
         plt.legend(loc='best', prop={'size': 8})
 
     plt.savefig('band_tmp.pdf', dpi=300, transparent=False)
-#    plt.show()
