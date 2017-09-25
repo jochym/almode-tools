@@ -18,6 +18,10 @@ for T in $* ; do
       ln -s ../${prefix}.born .
     fi
 
+    if [ -e ../${prefix}.path ] ; then
+      ln -s ../${prefix}.path .
+    fi
+
     make-gen.py gen -p $prefix -n SPOSCAR > ${prefix}_gen.in
     make-gen.py gen -p $prefix -n SPOSCAR |sed -e 's/MODE *= *[a-zA-Z]*/MODE = fitting /' > ${prefix}_fit.in
 

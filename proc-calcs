@@ -56,13 +56,18 @@ fi
 #sed -e 's/MODE *= *[a-zA-Z]*/MODE = phonons ;   FCSXML = '"${i}.xml"' /' \
 #    -e 's/NAT *= *[0-9]*//' -e 's/^# *MASS/  MASS/' < ${i}_gen.in >  ${i}_phon.in
 
+if [ -e ${i}.path ]; then
+    KPATH="G 0.0 0.0 0.0 X 0.0 0.5 0.5 51"
+else
+    KPATH=`cat ${i}.path`
+fi
 
 tfnp=`mktemp`
-cat <<EOF > $tfnp
+cat <<"EOF" > $tfnp
 
 &kpoint
   1  # KPMODE = 1: line mode
-  G 0.0 0.0 0.0 X 0.0 0.5 0.5 51
+  ${KPATH}
 /
 
 EOF

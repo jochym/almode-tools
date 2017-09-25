@@ -44,7 +44,8 @@ def disp(poscar, msdfile, temp, outfile, number):
                     for z, p, r in zip(cr.get_chemical_symbols(), basepos, rnd)])
         cr.set_positions(np)
         ase.io.vasp.write_vasp('%s_%03d.POSCAR' % (outfile,k), cr, direct=True, vasp5=True)
-        savetxt('%s_%03d.disp' % (outfile,k), concatenate((rnd, np-basepos), axis=1), fmt='%8.4f', header=' '.join(['%f' % sqrt(v) for v in dsp.reshape(-1)]))
+        savetxt('%s_%03d.disp' % (outfile,k), concatenate((rnd, np-basepos), axis=1),
+                fmt='%8.4f', header=' '.join(['%f' % sqrt(v) for v in dsp.reshape(-1)]))
     print()
 if __name__ == '__main__':
     disp()

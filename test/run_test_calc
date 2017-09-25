@@ -26,9 +26,31 @@ function vasp_wait {
     
 }
 
+function tdep_wait {
+    for f in T_*/calc-disp_*/OSZICAR ; do
+        echo -n "${f} :"
+        while true ; do
+            sleep 1
+            if grep -q 'F=' ${f} ; then
+                break
+            fi
+        done
+        echo "done"
+    done
+}
+
+
 mkdir -p harmonic
 (cd harmonic
     ln -s ../opt/{INCAR,KPOINTS,SPOSCAR,POTCAR,vasprun.conf} .
+
+    if [ -e ../${prefix}.born ] ; then
+      ln -s ../${prefix}.born .
+    fi
+
+    if [ -e ../${prefix}.path ] ; then
+      ln -s ../${prefix}.path .
+    fi
     
     make-gen.py -o 1 -p $nm -n SPOSCAR -s 1.0 -b 0 > ${nm}_gen.in
 
@@ -47,30 +69,26 @@ proc-dirs ${nm} harmonic
 
 VOL=1.02
 
-function tdep_wait {
-    for f in T_*/calc-disp_*/OSZICAR ; do
-        echo -n "${f} :"
-        while true ; do
-            sleep 1
-            if grep -q 'F=' ${f} ; then
-                break
-            fi
-        done
-        echo "done"
-    done
-}
 
 mkdir -p TDEP_${VOL}
 (cd TDEP_${VOL}
     ln -s ../harmonic/{INCAR,KPOINTS,POTCAR,vasprun.conf} .
     ln -s ../harmonic .
 
+    if [ -e ../${prefix}.born ] ; then
+      ln -s ../${prefix}.born .
+    fi
+
+    if [ -e ../${prefix}.path ] ; then
+      ln -s ../${prefix}.path .
+    fi
+
 python -c "from ase.io import read ;
 c=read('../harmonic/SPOSCAR', format='vasp');
 c.set_cell(${VOL}*c.get_cell(), scale_atoms=True); 
 c.write('SPOSCAR', vasp5=True, direct=True)"
 
-    make_tdep Zr 5 100 300 600
+    make_tdep ${nm} 5 100 300 600
     tdep_wait
     
     for d in T_{100,300,600} ; do
@@ -79,7 +97,7 @@ c.write('SPOSCAR', vasp5=True, direct=True)"
 
     proc-dirs ${nm} T_{100,300,600}_base
 
-    make_tdep Zr 10 100 300 600
+    make_tdep ${nm} 10 100 300 600
     tdep_wait
     proc-dirs ${nm} T_{100,300,600}
     
