@@ -37,7 +37,7 @@ for T in $* ; do
         ln -s ../harmonic base
     fi
 
-    make-disp.py -m base/${prefix}.msd -T $T -p SPOSCAR -n $n  disp
+    make-disp.py -r -d -m base/${prefix}.msd -T $T -p SPOSCAR -n $n  disp
 
     run-calcs
   )

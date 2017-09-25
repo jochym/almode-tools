@@ -3,11 +3,16 @@
 for s in disp*.POSCAR ; do
     d=${s%%.POSCAR}
     echo -n  $d ": "
-    mkdir calc-$d
-    (
-        cd calc-$d
-        ln -s ../INCAR ../KPOINTS ../POTCAR ../vasprun.conf .
-        ln -s ../$s POSCAR
-        run-on-tsi /opt/bin/run-vasp541
-    )
+#    if grep -s -q 'F=' calc-$d/OSZICAR ; then
+    if [ -e calc-$d/OSZICAR ] ; then
+        echo "Skip"
+    else
+        mkdir -p calc-$d
+        (
+            cd calc-$d
+            ln -s ../INCAR ../KPOINTS ../POTCAR ../vasprun.conf .
+            ln -s ../$s POSCAR
+            run-on-tsi /opt/bin/run-vasp541
+        )
+    fi
 done

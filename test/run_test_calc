@@ -103,5 +103,7 @@ c.write('SPOSCAR', vasp5=True, direct=True)"
     
     plotband.py -u THz T_{100,300,600}*/${nm}.bands
     mv band_tmp.pdf bands_summary.pdf
+    plotdos.py -u THz T_{100,300,600}*/${nm}.dos
+    mv dos_tmp.pdf dos_summary.pdf
 )
 
