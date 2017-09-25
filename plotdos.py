@@ -81,6 +81,21 @@ def get_y_minmax(array):
 
     return ymin, ymax
 
+def get_xy_minmax(xarray, yarray):
+
+    ymin, ymax = (0, 0)
+    eps = 1e-3
+    
+    xa = np.array(xarray)
+    ya = np.array(yarray)
+    
+    ymax = max(ymax, ya.max())
+    
+    xmin = xa[  (abs(ya) > eps*ymax).any(axis=-1) ].min()
+    xmax = xa[  (abs(ya) > eps*ymax).any(axis=-1) ].max()
+    
+    return xmin, xmax*1.1, ymin, ymax
+
 
 def change_xscale(array, str_scale):
 
@@ -157,8 +172,9 @@ if __name__ == '__main__':
         dos_merged.append(data_tmp[:, 1:])
 
     energy_axis = change_xscale(energy_axis, options.unitname)
-    xmin, xmax = get_x_minmax(energy_axis)
-    ymin, ymax = get_y_minmax(dos_merged)
+#    xmin, xmax = get_x_minmax(energy_axis)
+#    ymin, ymax = get_y_minmax(dos_merged)
+    xmin, xmax, ymin, ymax = get_xy_minmax(energy_axis, dos_merged)
 
     counter_line = 0
 

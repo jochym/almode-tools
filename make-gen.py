@@ -56,6 +56,7 @@ def gen(name, order, prefix, scale, action, evec, msd, tmax, born):
   KD = {kd}
   MASS = {mass}
   TMAX = {tmax}
+  EMIN = 0; EMAX = 1000; DELTA_E = 2
   {born}
 /
 
