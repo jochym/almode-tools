@@ -59,28 +59,6 @@ def get_natoms_and_symbols(file_in):
         return [], []
 
 
-def get_x_minmax(array):
-
-    xmin, xmax = [0, 0]
-
-    for i in range(len(array)):
-        xmin = min(xmin, array[i][0])
-        xmax = max(xmax, array[i][-1])
-
-    return xmin, xmax
-
-
-def get_y_minmax(array):
-
-    ymin, ymax = [0, 0]
-
-    for i in range(len(array)):
-        for j in range(len(array[i])):
-            for k in range(len(array[i][j])):
-                ymax = max(ymax, array[i][j][k])
-
-    return ymin, ymax
-
 def get_xy_minmax(xarray, yarray):
 
     ymin, ymax = (0, 0)
@@ -172,8 +150,6 @@ if __name__ == '__main__':
         dos_merged.append(data_tmp[:, 1:])
 
     energy_axis = change_xscale(energy_axis, options.unitname)
-#    xmin, xmax = get_x_minmax(energy_axis)
-#    ymin, ymax = get_y_minmax(dos_merged)
     xmin, xmax, ymin, ymax = get_xy_minmax(energy_axis, dos_merged)
 
     counter_line = 0
