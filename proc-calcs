@@ -63,7 +63,7 @@ else
 fi
 
 tfnp=`mktemp`
-cat <<"EOF" > $tfnp
+cat <<EOF > $tfnp
 
 &kpoint
   1  # KPMODE = 1: line mode

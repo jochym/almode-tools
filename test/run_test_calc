@@ -44,12 +44,12 @@ mkdir -p harmonic
 (cd harmonic
     ln -s ../opt/{INCAR,KPOINTS,SPOSCAR,POTCAR,vasprun.conf} .
 
-    if [ -e ../${prefix}.born ] ; then
-      ln -s ../${prefix}.born .
+    if [ -e ../${nm}.born ] ; then
+      ln -s ../${nm}.born .
     fi
 
-    if [ -e ../${prefix}.path ] ; then
-      ln -s ../${prefix}.path .
+    if [ -e ../${nm}.path ] ; then
+      ln -s ../${nm}.path .
     fi
     
     make-gen.py -o 1 -p $nm -n SPOSCAR -s 1.0 -b 0 > ${nm}_gen.in
@@ -75,12 +75,12 @@ mkdir -p TDEP_${VOL}
     ln -s ../harmonic/{INCAR,KPOINTS,POTCAR,vasprun.conf} .
     ln -s ../harmonic .
 
-    if [ -e ../${prefix}.born ] ; then
-      ln -s ../${prefix}.born .
+    if [ -e ../${nm}.born ] ; then
+      ln -s ../${nm}.born .
     fi
 
-    if [ -e ../${prefix}.path ] ; then
-      ln -s ../${prefix}.path .
+    if [ -e ../${nm}.path ] ; then
+      ln -s ../${nm}.path .
     fi
 
 python -c "from ase.io import read ;
@@ -102,6 +102,6 @@ c.write('SPOSCAR', vasp5=True, direct=True)"
     proc-dirs ${nm} T_{100,300,600}
     
     plotband.py -u THz T_{100,300,600}*/${nm}.bands
-
+    mv band_tmp.pdf bands_summary.pdf
 )
 
