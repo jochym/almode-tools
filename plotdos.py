@@ -158,7 +158,8 @@ if __name__ == '__main__':
         counter_line = counter_line % 12
 
         plt.plot(energy_axis[i][:], dos_merged[i][:, 0],
-                 linestyle=lsty[counter_line], color=color[counter_line], label="File" + str(i + 1) + ".Total")
+                 linestyle=lsty[counter_line], color=color[counter_line],
+                 label=files[i] + ":Total")
 
         counter_line += 1
 
@@ -174,7 +175,8 @@ if __name__ == '__main__':
                 for j in range(len(pdos[0, :])):
 
                     plt.plot(energy_axis[i][:], pdos[:, j], linestyle=lsty[counter_line],
-                             color=color[counter_line], label="File" + str(i + 1) + "." + symbols[j])
+                             color=color[counter_line],
+                             label=files[i] + ":" + symbols[j])
 
                     counter_line += 1
 
