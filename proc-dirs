@@ -9,7 +9,7 @@ for d in $* ; do
     (cd $d
         echo -n "Enter $d: "
         if [ -f ${prefix}.bands ] ; then 
-            echo " ready "
+            echo "${prefix}.bands present in $d. Sikipping processing."
         else
             proc-calcs ${prefix}
         fi
