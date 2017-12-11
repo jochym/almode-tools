@@ -37,6 +37,8 @@ function tdep_wait {
         done
         echo "done"
     done
+    echo "Wait for all calcs to finish"
+    sleep 10
 }
 
 

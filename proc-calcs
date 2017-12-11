@@ -19,6 +19,9 @@ n=`ls -d calc-disp* | wc -l`
 echo "NDAT: $n"
 
 sed -e 's/MODE *= *[a-zA-Z]*/MODE = fitting /' < ${i}_gen.in >  ${i}_fit.in
+if [ -e ${i}_gen_cub.in ]; then
+    sed -e 's/MODE *= *[a-zA-Z]*/MODE = fitting /' < ${i}_gen_cub.in >  ${i}_fit_cub.in
+fi
 
 tfn=`mktemp`
 
@@ -34,11 +37,7 @@ EOF
 
 cat $tfn >> ${i}_fit.in
 if [ -e ${i}_fit_cub.in ]; then
-    if grep -q '&fitting' ${i}_fit_cub.in ; then
-        echo "Cubic input already generated"
-    else
-        cat $tfn >> ${i}_fit_cub.in
-    fi
+    cat $tfn >> ${i}_fit_cub.in
 fi
 
 rm -f $tfn
