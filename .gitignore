@@ -3,3 +3,5 @@
 
 # Testing dir
 test/
+
+.ipynb_checkpoints
