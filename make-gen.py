@@ -4,7 +4,7 @@ import sys
 import ase.io
 import spglib
 import click
-
+from collections import OrderedDict
 
 @click.command()
 @click.argument('action', default='gen')
@@ -86,7 +86,7 @@ def gen(name, order, prefix, scale, action, evec, msd, tmax, born):
     
     nat = len(cr.get_atomic_numbers())
     nkd = len(set(cr.get_atomic_numbers()))
-    kd = ' '.join(set(cr.get_chemical_symbols()))
+    kd = ' '.join(list(OrderedDict.fromkeys(cr.get_chemical_symbols())))
     scl = 1.889725989*scale # in A -> bohr
     elems = {e:n+1 for n, e in enumerate(kd.split())}
     masses = {e:m for e,m in zip(cr.get_chemical_symbols(), cr.get_masses())}
