@@ -5,6 +5,15 @@ i=${1%%_gen.in}
 ALM=/opt/bin/alm
 ANPH=/opt/bin/anphon
 
+OK=''
+python -c 'import ase' 2>/dev/null >/dev/null && OK=1
+
+if [ -z "$OK" ] ; then 
+    echo "No ASE packages in the environment. Activate python env."
+    exit 1
+fi
+
+
 export LANG=C.UTF-8
 
 echo "Process: $i"
