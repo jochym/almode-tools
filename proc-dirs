@@ -5,6 +5,14 @@ export LC_ALL=C.UTF-8
 prefix=$1
 shift
 
+HAS_ASE=''
+python -c 'import ase' 2>/dev/null >/dev/null && HAS_ASE=1
+
+if [ -z "$HAS_ASE" ] ; then 
+    echo "No ASE packages in the environment. Activate python env."
+    exit 1
+fi
+
 for d in $* ; do
     (cd $d
         echo -n "Enter $d: "
