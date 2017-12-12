@@ -5,14 +5,12 @@ i=${1%%_gen.in}
 ALM=/opt/bin/alm
 ANPH=/opt/bin/anphon
 
+export LANG=C.UTF-8
+
 echo "Process: $i"
 
 extract.py --VASP=SPOSCAR --get=disp calc-disp*/vasprun*.xml > disp.dat
 extract.py --VASP=SPOSCAR --get=force calc-disp*/vasprun*.xml > force.dat
-
-fl=`ls ${i}.pattern_*`
-n=`cat $fl |grep '^\s*[0-9]*:' |wc -l`
-nh=`grep '^\s*[0-9]*:' <${i}.pattern_HARMONIC |wc -l`
 
 n=`ls -d calc-disp* | wc -l`
 
