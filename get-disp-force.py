@@ -100,7 +100,7 @@ def make_disp_force(poscar, traj, number, disp, force, configs):
     print(f'#Writing {disp} and {force} files from {number} random steps out of {traj} file.')
     print('#Time steps:')
     with open(disp,'bw') as dsp, open(force, 'bw') as frc:
-        for k in sorted(choice(arange(pos.shape[0]),number)):
+        for k in sorted(choice(arange(pos.shape[0]), number, replace=False)):
             savetxt(dsp, (pos[k]-p0)*units.Bohr, fmt='%24.18f')
             savetxt(frc, tr[k].get_forces()*units.Ry/units.Bohr, fmt='%24.18f')
             print(f'{k}', end=' ')
