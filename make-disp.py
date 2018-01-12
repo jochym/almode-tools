@@ -34,6 +34,7 @@ def disp(poscar, msdfile, temp, outfile, number, rnd_names, save_disp):
     """Generates thermal displacement files """
 
     cr = ase.io.read(poscar)
+    cr.set_pbc(False)
     elems=read_elm_order(cr)
     msd=loadtxt(path.join(msdfile)).T
     dsp=scipy.interpolate.interp1d(msd[0],msd[1:])(temp)
