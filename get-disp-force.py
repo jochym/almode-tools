@@ -106,7 +106,7 @@ def make_disp_force(poscar, traj, number, disp, force, configs):
             print(f'{k}', end=' ')
             sys.stdout.flush()
             if configs :
-                ase.io.write(f'disp_{k:04d}.POSCAR')
+                ase.io.write(f'disp_{n:04d}_{k:04d}.POSCAR', tr[k], direct=True, vasp5=True)
             n+=1    
     print()
     print(f'#Finished: {number} configs extracted')
