@@ -59,7 +59,7 @@ def normalize_traj(c, tr):
     return dot(spos,cell), spos, sdx, stcm, dot(stcm,cell)
 
 
-def read_traj(c0, dn, fn='vasprun.xml'):
+def read_traj(c0, fn):
     '''
     Read the trajectory from vasprun.xml or OUTCAR
     Calculate the velocities (unwrapping PBC jumps)
@@ -68,8 +68,8 @@ def read_traj(c0, dn, fn='vasprun.xml'):
     The c0 is used as a reference system.
     '''
     print(f'Reading {dn}',end=':')
-    tr=ase.io.read(dn+f'/{fn}',index=':')
-    dt=read_potim(dn+f'/{fn}')*ase.units.fs
+    tr=ase.io.read(fn,index=':')
+    dt=read_potim(fn)*ase.units.fs
     print(f'{len(tr)}')
     base=Atoms(c0)
     cell=tr[0].get_cell()
