@@ -2,7 +2,7 @@
 
 import numpy as np
 from numpy import array, zeros, arange, savetxt
-from numpy import dot
+from numpy import dot, mod
 from numpy.linalg import inv
 from numpy.random import choice
 import ase
@@ -117,8 +117,8 @@ def make_disp_force(poscar, traj, number, disp, force, configs):
     print('#Time steps:')
     with open(disp,'bw') as dsp, open(force, 'bw') as frc:
         for k in sorted(choice(arange(pos.shape[0]), number, replace=False)):
-            savetxt(dsp, (pos[k]-p0)*units.Bohr, fmt='%24.18f')
-            savetxt(frc, tr[k].get_forces()*units.Ry/units.Bohr, fmt='%24.18f')
+            savetxt(dsp, (pos[k]-p0)/units.Bohr, fmt='%24.18f')
+            savetxt(frc, tr[k].get_forces()/(units.Ry/units.Bohr), fmt='%24.18f')
             print(f'{k}', end=' ')
             sys.stdout.flush()
             if configs :
