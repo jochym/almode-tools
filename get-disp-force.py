@@ -22,7 +22,44 @@ def read_potim(fn):
                 return float(''.join(potim))
     return None    
 
-def read_traj(c0, fn='vasprun.xml'):
+def normalize_traj(c, tr):
+    base=Atoms(c)
+    cell=tr[0].get_cell()
+    base.set_cell(cell, scale_atoms=True)
+    
+    spos=array([a.get_scaled_positions() for a in tr])
+
+    # Calculate unwrapped step-by-step atom displacements
+    sdx=spos[1:]-spos[:-1]
+    sht=(sdx < -0.5)*1 - (sdx > 0.5)*1
+    sdx+=sht
+    # Check if step-to-step fractional displacements are below 1/3
+    assert (abs(sdx) < 1/3).all()
+
+    # All below computed in fractional coordinates 
+    
+    # Calculate step-to-step CM drift and integrate it to CM trajectory
+    # CM displacements
+    sdcm=(sdx*base.get_masses()[None,:,None]).sum(axis=1)/base.get_masses().sum()
+    # Integrate (sum) the displacements
+    stcm=sdcm.cumsum(axis=0)
+    # Remove CM drift wrapped for PBC
+    spos[1:]-=mod(stcm[:,None,:],1)
+    
+    # Unwrap the initial position relative to base
+    sp=spos-base.get_scaled_positions()
+    spsht=(sp < -0.5)*1 - (sp > 0.5)*1
+    spos+=spsht
+    # Calculate mean CM position along the trajectory
+    scm=(spos*base.get_masses()[None,:,None]).sum(axis=1).mean(axis=0)/base.get_masses().sum()
+    # Move the mean CM position to the reference CM position
+    spos+=(dot(base.get_center_of_mass(),inv(cell)) - scm)
+    
+    # Return carthesian positions, fractional positions, fractional cm traj, cm traj
+    return dot(spos,cell), spos, sdx, stcm, dot(stcm,cell)
+
+
+def read_traj(c0, dn, fn='vasprun.xml'):
     '''
     Read the trajectory from vasprun.xml or OUTCAR
     Calculate the velocities (unwrapping PBC jumps)
@@ -30,39 +67,16 @@ def read_traj(c0, fn='vasprun.xml'):
     Return unwrapped positions, fractional positions, velocities and CM drift.
     The c0 is used as a reference system.
     '''
-    print(f'#Reading {fn}',end=':')
-    sys.stdout.flush()
-    tr=ase.io.read(fn,index=':')
-    dt=read_potim(fn)*ase.units.fs
+    print(f'Reading {dn}',end=':')
+    tr=ase.io.read(dn+f'/{fn}',index=':')
+    dt=read_potim(dn+f'/{fn}')*ase.units.fs
     print(f'{len(tr)}')
-    sys.stdout.flush()
     base=Atoms(c0)
     cell=tr[0].get_cell()
     base.set_cell(cell, scale_atoms=True)
     
-    pos=array([a.get_positions() for a in tr])
-    spos=array([a.get_scaled_positions() for a in tr])
-
-    # Calculate unwrapped step-by-step displacements
-    sdx=spos[1:]-spos[:-1]
-    sht=(sdx < -0.5)*1 - (sdx > 0.5)*1
-    sdx+=sht
-    # Check if step-to-step fractional displacements are below 1/3
-    assert (abs(sdx) < 1/3).all()
+    pos, spos, sdx, stcm, tcm = normalize_traj(base, tr)
     
-    # Calculate step-to-step CM drift and integrate it to CM trajectory
-    # Computed in carthesian coordinates
-    dcm=(dot(sdx,cell)*base.get_masses()[None,:,None]).sum(axis=1)/base.get_masses().sum()
-    tcm=dcm.cumsum(axis=0)
-    
-    # Unwrap the initial position relative to base
-    p0=spos-base.get_scaled_positions()
-    p0sht=dot((p0 < -0.5)*1 - (p0 > 0.5)*1, cell)
-    pos+=p0sht
-    
-    # Remove the drift of the CM
-    pos[1:]-=tcm[:,None,:]
-
     # Calculate the central difference velocities
     v=zeros(pos.shape)
     v[:-1]=dot(sdx,cell)/dt
@@ -73,13 +87,15 @@ def read_traj(c0, fn='vasprun.xml'):
     return {
         'base':base,
         'dt':dt,
-        'fname': fn,
+        'fname': dn,
         'trj': tr,
         'pos': pos,
-        'spos': dot(pos,inv(base.get_cell())),
+        'spos': spos,
         'vel': v,
-        'sdrift':tcm,
+        'drift':tcm,
     }
+
+
 
 @click.command()
 @click.option('-p', '--poscar', default='SPOSCAR', type=click.Path(exists=True), help='Supercell POSCAR file (SPOSCAR)')
@@ -106,7 +122,10 @@ def make_disp_force(poscar, traj, number, disp, force, configs):
             print(f'{k}', end=' ')
             sys.stdout.flush()
             if configs :
-                ase.io.write(f'disp_{n:04d}_{k:04d}.POSCAR', tr[k], direct=True, vasp5=True)
+                a=Atoms(tr[k])
+                a.set_pbc(False)
+                a.set_positions(pos[k])
+                ase.io.write(f'disp_{n:04d}_{k:04d}.POSCAR', a, direct=True, vasp5=True)
             n+=1    
     print()
     print(f'#Finished: {number} configs extracted')
