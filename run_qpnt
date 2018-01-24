@@ -16,10 +16,11 @@ for (( k=0 ; k < ${nq} / 2 + 1 ; k=k+1 )) ; do
         else 
             mkdir -p $d
             (cd $d
-                ln -s ../QHA.xml ../QHA.born .
+                ln -s ../${prefix}.xml ../${prefix}.born .
                 sed -e "s/q/${q}/g"  -e "s/n/${n}/g" < ../${prefix}_modes.in > ${prefix}_modes.in
-                sed -e "s/nq/${nq}/g" < ../ph_self.in > ph_self.in
+                sed -e "s/nq/${nq}/g" < ../${prefix}.in > ${prefix}.in
                 run-on-tsi "../run-anph ${p} ${d} ${rsc}"
+                #anphon ${prefix}.in |tee ${prefix}.log
             )
         fi
     done

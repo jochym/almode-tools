@@ -67,7 +67,7 @@ def read_traj(c0, fn):
     Return unwrapped positions, fractional positions, velocities and CM drift.
     The c0 is used as a reference system.
     '''
-    print(f'Reading {dn}',end=':')
+    print(f'Reading {fn}',end=':')
     tr=ase.io.read(fn,index=':')
     dt=read_potim(fn)*ase.units.fs
     print(f'{len(tr)}')
@@ -87,7 +87,7 @@ def read_traj(c0, fn):
     return {
         'base':base,
         'dt':dt,
-        'fname': dn,
+        'fname': fn,
         'trj': tr,
         'pos': pos,
         'spos': spos,
