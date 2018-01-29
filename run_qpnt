@@ -23,7 +23,7 @@ for (( k=0 ; k < ${nq} / 2 + 1 ; k=k+1 )) ; do
                 ln -s ../${prefix}.xml ../${prefix}.born .
                 sed -e "s/q/${q}/g"  -e "s/n/${n}/g" < ../${prefix}_modes.in > ${prefix}_modes.in
                 sed -e "s/nq/${nq}/g" < ../${prefix}.in > ${prefix}.in
-                run-on-tsi "../run-anph ${d} ${node}"
+                run-on-tsi "../run-anph ${d} ${nodes}"
                 #anphon ${prefix}.in |tee ${prefix}.log
             )
         fi
