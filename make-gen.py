@@ -70,6 +70,7 @@ def gen(name, order, prefix, scale, action, evec, msd, tmax, born):
 &analysis
   PRINTMSD = {msd}
   PRINTEVEC = {evec}
+  SPS = 1
 /
 
 '''}
