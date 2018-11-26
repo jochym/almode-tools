@@ -63,9 +63,9 @@ fi
 #    -e 's/NAT *= *[0-9]*//' -e 's/^# *MASS/  MASS/' < ${i}_gen.in >  ${i}_phon.in
 
 if [ -e ${i}.path ]; then
-    KPATH="G 0.0 0.0 0.0 X 0.0 0.5 0.5 51"
-else
     KPATH=`cat ${i}.path`
+else
+    KPATH="G 0.0 0.0 0.0 X 0.0 0.5 0.5 51"
 fi
 
 tfnp=`mktemp`
