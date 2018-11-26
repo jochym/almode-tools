@@ -59,7 +59,7 @@ def normalize_traj(c, tr):
     return dot(spos,cell), spos, sdx, stcm, dot(stcm,cell)
 
 
-def read_traj(c0, fn):
+def read_traj(c0, fn, skip=0):
     '''
     Read the trajectory from vasprun.xml or OUTCAR
     Calculate the velocities (unwrapping PBC jumps)
@@ -67,8 +67,8 @@ def read_traj(c0, fn):
     Return unwrapped positions, fractional positions, velocities and CM drift.
     The c0 is used as a reference system.
     '''
-    print(f'Reading {dn}',end=':')
-    tr=ase.io.read(fn,index=':')
+    print(f'Reading {fn}',end=':')
+    tr=ase.io.read(fn,index=f'{skip}:')
     dt=read_potim(fn)*ase.units.fs
     print(f'{len(tr)}')
     base=Atoms(c0)
@@ -87,7 +87,7 @@ def read_traj(c0, fn):
     return {
         'base':base,
         'dt':dt,
-        'fname': dn,
+        'fname': fn,
         'trj': tr,
         'pos': pos,
         'spos': spos,
@@ -100,14 +100,15 @@ def read_traj(c0, fn):
 @click.command()
 @click.option('-p', '--poscar', default='SPOSCAR', type=click.Path(exists=True), help='Supercell POSCAR file (SPOSCAR)')
 @click.option('-t', '--traj', default='vasprun.xml', type=click.Path(exists=True), help='Trajectory file OUTCAR or vasprun.xml (vasprun.xml)')
+@click.option('-s', '--skip', default=0, help='Skip initial time steps (0)')
 @click.option('-n', '--number', default=50, help='Number of configurations (50)')
 @click.option('-d', '--disp', default='disp.dat', help='Displacement file (disp.dat)')
 @click.option('-f', '--force', default='force.dat', help='Forces file (force.dat)')
 @click.option('-c', '--configs', is_flag=True, default=False, help='Write disp_xxx.POSCAR files')
-def make_disp_force(poscar, traj, number, disp, force, configs):
+def make_disp_force(poscar, traj, skip, number, disp, force, configs):
     """Generates displacement and forces files from the MD trajectory"""
     base=ase.io.read(poscar)
-    md=read_traj(base, traj)
+    md=read_traj(base, traj, skip)
     pos=md['pos']
     base=md['base']
     tr=md['trj']

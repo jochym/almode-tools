@@ -1,9 +1,13 @@
 #!/bin/bash
 
 prefix=$1
-p=$2
-nq=$3
-rsc=$4
+nq=$2
+
+if [ .$3 == "." ] ; then
+    nodes="nodes=1:ppn=8"
+else
+    nodes=$3
+fi
 
 
 for (( k=0 ; k < ${nq} / 2 + 1 ; k=k+1 )) ; do
@@ -16,10 +20,11 @@ for (( k=0 ; k < ${nq} / 2 + 1 ; k=k+1 )) ; do
         else 
             mkdir -p $d
             (cd $d
-                ln -s ../QHA.xml ../QHA.born .
+                ln -s ../${prefix}.xml ../${prefix}.born .
                 sed -e "s/q/${q}/g"  -e "s/n/${n}/g" < ../${prefix}_modes.in > ${prefix}_modes.in
-                sed -e "s/nq/${nq}/g" < ../ph_self.in > ph_self.in
-                run-on-tsi "../run-anph ${p} ${d} ${rsc}"
+                sed -e "s/nq/${nq}/g" < ../${prefix}.in > ${prefix}.in
+                run-on-tsi "../run-anph ${d} ${nodes}"
+                #anphon ${prefix}.in |tee ${prefix}.log
             )
         fi
     done

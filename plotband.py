@@ -215,7 +215,7 @@ if __name__ == '__main__':
     plt.xticks(xticksvars[0:], xtickslabels[0:], fontsize=12)
     plt.yticks(fontsize=16)
 
-    ax = plt.subplot(111)
+    ax = plt.gca()
     ax.xaxis.grid(True, linestyle='-')
 
     if options.print_key:
