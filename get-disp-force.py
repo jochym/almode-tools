@@ -105,8 +105,10 @@ def read_traj(c0, fn, skip=0):
 @click.option('-d', '--disp', default='disp.dat', help='Displacement file (disp.dat)')
 @click.option('-f', '--force', default='force.dat', help='Forces file (force.dat)')
 @click.option('-c', '--configs', is_flag=True, default=False, help='Write disp_xxx.POSCAR files')
-def make_disp_force(poscar, traj, skip, number, disp, force, configs):
+@click.option('-r', '--report', default=None, type=click.Path(exists=False), help='Report selected timestaps to file (no report by default)')
+def make_disp_force(poscar, traj, skip, number, disp, force, configs, report):
     """Generates displacement and forces files from the MD trajectory"""
+    rpt=None
     base=ase.io.read(poscar)
     md=read_traj(base, traj, skip)
     pos=md['pos']
@@ -117,18 +119,26 @@ def make_disp_force(poscar, traj, skip, number, disp, force, configs):
     print(f'#Writing {disp} and {force} files from {number} random steps out of {traj} file.')
     print('#Time steps:')
     with open(disp,'bw') as dsp, open(force, 'bw') as frc:
+        if configs and report is not None:
+            rpt=open(report, 'tw')
         for k in sorted(choice(arange(pos.shape[0]), number, replace=False)):
             savetxt(dsp, (pos[k]-p0)/units.Bohr, fmt='%24.18f')
             savetxt(frc, tr[k].get_forces()/(units.Ry/units.Bohr), fmt='%24.18f')
-            print(f'{k}', end=' ')
+            print(f'{k+skip}', end=' ')
             sys.stdout.flush()
             if configs :
                 a=Atoms(tr[k])
                 a.set_pbc(False)
                 a.set_positions(pos[k])
                 ase.io.write(f'disp_{n:04d}_{k:04d}.POSCAR', a, direct=True, vasp5=True)
+                if rpt is not None :
+                    rpt.write(f'{k+skip}\n')
             n+=1    
     print()
     print(f'#Finished: {number} configs extracted')
+    if rpt is not None:
+        close(rpt)
+        rpt=None
+        
 if __name__ == '__main__':
     make_disp_force()
