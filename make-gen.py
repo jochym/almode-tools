@@ -17,9 +17,7 @@ from collections import OrderedDict
 @click.option('-t', '--tmax', default=1000, help='Max temperature (1000)')
 @click.option('-b', '--born', default='', help='Use info from <prefix>.born as Born effective charges')
 def gen(name, order, prefix, scale, action, evec, msd, tmax, born):
-    """Generates gen/opt/phon/dos file depending on the ACTION
-       Default action is gen
-    """
+    """Generates gen/opt/phon/dos file depending on the ACTION (default: gen)."""
 
     tmpl={'gen':
 '''
