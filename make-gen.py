@@ -17,7 +17,9 @@ from collections import OrderedDict
 @click.option('-t', '--tmax', default=1000, help='Max temperature (1000)')
 @click.option('-b', '--born', default='', help='Use info from <prefix>.born as Born effective charges')
 def gen(name, order, prefix, scale, action, evec, msd, tmax, born):
-    """Generates gen file """
+    """Generates gen/opt/phon/dos file depending on the ACTION
+       Default action is gen
+    """
 
     tmpl={'gen':
 '''
@@ -27,6 +29,37 @@ def gen(name, order, prefix, scale, action, evec, msd, tmax, born):
   NAT = {nat}
   NKD = {nkd}
   KD = {kd}
+/
+
+&interaction
+  NORDER = {order}  # 1: harmonic, 2: cubic, ..
+/
+
+&cell
+  {scale:14.10f} # factor 
+  {cell} # cell matrix
+/
+
+&cutoff 
+  {cutoff}
+/
+
+&position
+  {positions}
+/
+''',
+      'opt':
+'''
+&general
+  PREFIX = {prefix}
+  MODE = optimize
+  NAT = {nat}
+  NKD = {nkd}
+  KD = {kd}
+/
+
+&optimize
+  DFSET = DFSET
 /
 
 &interaction
