@@ -23,42 +23,13 @@ def gen(name, order, prefix, scale, action, evec, msd, tmax, born):
 '''
 &general
   PREFIX = {prefix}
-  MODE = suggest
+  MODE = {mode}
   NAT = {nat}
   NKD = {nkd}
   KD = {kd}
 /
 
-&interaction
-  NORDER = {order}  # 1: harmonic, 2: cubic, ..
-/
-
-&cell
-  {scale:14.10f} # factor 
-  {cell} # cell matrix
-/
-
-&cutoff 
-  {cutoff}
-/
-
-&position
-  {positions}
-/
-''',
-      'opt':
-'''
-&general
-  PREFIX = {prefix}
-  MODE = optimize
-  NAT = {nat}
-  NKD = {nkd}
-  KD = {kd}
-/
-
-&optimize
-  DFSET = DFSET
-/
+{dfset}
 
 &interaction
   NORDER = {order}  # 1: harmonic, 2: cubic, ..
@@ -108,11 +79,20 @@ def gen(name, order, prefix, scale, action, evec, msd, tmax, born):
 
 
     cr = ase.io.read(name)
+    mode = ''
     
     cell = cr.get_cell()
     if action in ['phon','dos']:
-        cell=spglib.find_primitive(cr)[0]    
-        action='phon'
+      cell=spglib.find_primitive(cr)[0]    
+      action='phon'
+    if action == 'opt':
+      dfset = '&optimize\n  DFSET = DFSET\n/\n'
+    else :
+      dfset = ''
+    if action in ['gen','opt']:
+      mode = {'gen':'suggest', 'opt':'optimize'}[action]
+      action = 'gen'
+
 
     cell = '\n  '.join([' '.join(['%14.10f' % c for c in v]) for v in cell])
     
@@ -138,7 +118,8 @@ def gen(name, order, prefix, scale, action, evec, msd, tmax, born):
         born = ''
 
     print(tmpl[action].format(prefix=prefix, nat=nat, nkd=nkd, kd=kd, order=order, evec=evec, msd=msd,
-                      scale=scl, cell=cell, cutoff=cutoff, positions=positions, mass=mass, tmax=tmax, born=born))
+                              scale=scl, cell=cell, cutoff=cutoff, positions=positions, mass=mass, tmax=tmax, 
+                              born=born, mode=mode, dfset=dfset))
     
 if __name__ == '__main__':
     gen()
