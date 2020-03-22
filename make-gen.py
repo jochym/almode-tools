@@ -14,10 +14,19 @@ from collections import OrderedDict
 @click.option('-s', '--scale', default=1.0, help='Scale of the unit cell (1.0)')
 @click.option('-e', '--evec', default=1, help='Print eigenvectors (1)')
 @click.option('-m', '--msd', default=1, help='Print mean squere displacement (1)')
+@click.option('--c1', default='None', type=str, help='First order interaction cutoff (None)')
+@click.option('--c2', default='10', type=str, help='Second order interaction cutoff (10)')
+@click.option('--c3', default='10', type=str, help='Third order interaction cutoff (10)')
+@click.option('-k', '--kpath', default=None, type=click.Path(exists=True), help='File with reciprocal space path')
+@click.option('-g', '--grid', default='10x10x10', help='k-grid for dos calculation (10x10x10)')
+@click.option('-d', '--ndat', default=None, help='Number of data points used in fitting (All)', type=int)
 @click.option('-t', '--tmax', default=1000, help='Max temperature (1000)')
-@click.option('-b', '--born', default='', help='Use info from <prefix>.born as Born effective charges')
-def gen(name, order, prefix, scale, action, evec, msd, tmax, born):
-    """Generates gen/opt/phon/dos file depending on the ACTION (default: gen)."""
+@click.option('-b', '--born', default=0, help='If non-zero use info from <prefix>.born as Born effective charges.' + 
+                                              ' Use <born> = [1,2,3] value to select method of non-analytic correction.')
+def gen(name, order, prefix, scale, action, evec, msd, tmax, born, ndat, kpath, grid, c1, c2, c3):
+    """Generates gen/opt/phon/dos file depending on the ACTION (default: gen).
+       The default values of parameters are enclosed in parethesis.
+    """
 
     tmpl={'gen':
 '''
@@ -75,18 +84,39 @@ def gen(name, order, prefix, scale, action, evec, msd, tmax, born):
   PDOS = 1
 /
 
+&kpoint
+  {KMODE}
+{KPATH}
+/
+
 '''}
 
 
     cr = ase.io.read(name)
     mode = ''
+    NDATA = ''
+    KMODE = 1
+    KPATH = '10 10 10'
     
     cell = cr.get_cell()
+    if action == 'dos':
+      KMODE = 2
+      KPATH = ' '.join(grid.split('x'))
+    if action == 'phon':
+      KMODE = 1
+      if kpath is not None:
+        with open(kpath) as kpf:
+          KPATH = ''.join(kpf.readlines())
+      else :
+        print('No k-path given. Using Gamma-X.', file=sys.stderr)
+        KPATH = 'G 0.0 0.0 0.0   X 0.0 0.5 0.0   51'
     if action in ['phon','dos']:
       cell=spglib.find_primitive(cr)[0]    
       action='phon'
     if action == 'opt':
-      dfset = '&optimize\n  DFSET = DFSET\n/\n'
+      if ndat is not None:
+        NDATA = f'NDATA = {ndat}'
+      dfset = f'&optimize\n  DFSET = DFSET\n  {NDATA}\n/\n'
     else :
       dfset = ''
     if action in ['gen','opt']:
@@ -107,7 +137,7 @@ def gen(name, order, prefix, scale, action, evec, msd, tmax, born):
         for e, p in zip(cr.get_chemical_symbols(),cr.get_scaled_positions())])
     
     elm=kd.split()
-    cutoff='\n  '.join(['{}-{} {}'.format(a,b, order * ' None') 
+    cutoff='\n  '.join(['{}-{} {}'.format(a,b, ' '.join([f'{c1}', f'{c2}', f'{c3}'][:order])) 
                         for k,a in enumerate(elm) for l,b in enumerate(elm) if k<=l])
     
     mass = ' '.join(['{:14.10f}'.format(masses[e]) for e in kd.split()])
@@ -119,7 +149,7 @@ def gen(name, order, prefix, scale, action, evec, msd, tmax, born):
 
     print(tmpl[action].format(prefix=prefix, nat=nat, nkd=nkd, kd=kd, order=order, evec=evec, msd=msd,
                               scale=scl, cell=cell, cutoff=cutoff, positions=positions, mass=mass, tmax=tmax, 
-                              born=born, mode=mode, dfset=dfset))
+                              born=born, mode=mode, dfset=dfset, KMODE=KMODE, KPATH=KPATH))
     
 if __name__ == '__main__':
     gen()
