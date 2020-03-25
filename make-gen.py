@@ -20,10 +20,11 @@ from collections import OrderedDict
 @click.option('-k', '--kpath', default=None, type=click.Path(exists=True), help='File with reciprocal space path')
 @click.option('-g', '--grid', default='10x10x10', help='k-grid for dos calculation (10x10x10)')
 @click.option('-d', '--ndat', default=None, help='Number of data points used in fitting (All)', type=int)
+@click.option('-f', '--dfset', default='DFSET', help='Name of the DFSET file (DFSET)')
 @click.option('-t', '--tmax', default=1000, help='Max temperature (1000)')
 @click.option('-b', '--born', default=0, help='If non-zero use info from <prefix>.born as Born effective charges.' + 
                                               ' Use <born> = [1,2,3] value to select method of non-analytic correction.')
-def gen(name, order, prefix, scale, action, evec, msd, tmax, born, ndat, kpath, grid, c1, c2, c3):
+def gen(name, order, prefix, scale, action, evec, msd, tmax, born, ndat, kpath, grid, c1, c2, c3, dfset):
     """Generates gen/opt/phon/dos file depending on the ACTION (default: gen).
        The default values of parameters are enclosed in parethesis.
     """
@@ -116,7 +117,7 @@ def gen(name, order, prefix, scale, action, evec, msd, tmax, born, ndat, kpath, 
     if action == 'opt':
       if ndat is not None:
         NDATA = f'NDATA = {ndat}'
-      dfset = f'&optimize\n  DFSET = DFSET\n  {NDATA}\n/\n'
+      dfset = f'&optimize\n  DFSET = {dfset}\n  {NDATA}\n/\n'
     else :
       dfset = ''
     if action in ['gen','opt']:
