@@ -19,12 +19,13 @@ from collections import OrderedDict
 @click.option('--c3', default='10', type=str, help='Third order interaction cutoff (10)')
 @click.option('-k', '--kpath', default=None, type=click.Path(exists=True), help='File with reciprocal space path')
 @click.option('-g', '--grid', default='10x10x10', help='k-grid for dos calculation (10x10x10)')
-@click.option('-d', '--ndat', default=None, help='Number of data points used in fitting (All)', type=int)
+@click.option('-d', '--ndat', default=0, help='Number of data points used in fitting (All)', type=int)
 @click.option('-f', '--dfset', default='DFSET', help='Name of the DFSET file (DFSET)')
 @click.option('-t', '--tmax', default=1000, help='Max temperature (1000)')
+@click.option('-c', '--charge', default=None, help='Name of the Born effective charges file (<prefix>.born)')
 @click.option('-b', '--born', default=0, help='If non-zero use info from <prefix>.born as Born effective charges.' + 
                                               ' Use <born> = [1,2,3] value to select method of non-analytic correction.')
-def gen(name, order, prefix, scale, action, evec, msd, tmax, born, ndat, kpath, grid, c1, c2, c3, dfset):
+def gen(name, order, prefix, scale, action, evec, msd, tmax, charge, born, ndat, kpath, grid, c1, c2, c3, dfset):
     """Generates gen/opt/phon/dos file depending on the ACTION (default: gen).
        The default values of parameters are enclosed in parethesis.
     """
@@ -115,7 +116,7 @@ def gen(name, order, prefix, scale, action, evec, msd, tmax, born, ndat, kpath, 
       cell=spglib.find_primitive(cr)[0]    
       action='phon'
     if action == 'opt':
-      if ndat is not None:
+      if ndat > 0:
         NDATA = f'NDATA = {ndat}'
       dfset = f'&optimize\n  DFSET = {dfset}\n  {NDATA}\n/\n'
     else :
@@ -144,7 +145,9 @@ def gen(name, order, prefix, scale, action, evec, msd, tmax, born, ndat, kpath, 
     mass = ' '.join(['{:14.10f}'.format(masses[e]) for e in kd.split()])
     
     if born :
-        born = 'BORNINFO = {prefix}.born \n  NONANALYTIC = {born} \n'.format(prefix=prefix, born=born)
+        if charge is None:
+          charge=prefix
+        born = 'BORNINFO = {charge}.born \n  NONANALYTIC = {born} \n'.format(born=born, charge=charge)
     else :
         born = ''
 
