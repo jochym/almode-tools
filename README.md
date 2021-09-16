@@ -1,5 +1,6 @@
-Tools for alamode program to facilitate the calculations
---------------------------------------------------------
+# Alamode Tools
+> Set of auxiliary tools for Alamode phonon programs
+
 
 The directory structure
 
